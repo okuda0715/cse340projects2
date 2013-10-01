@@ -1,0 +1,5 @@
+decl idL.ist1 idList #
+COLON ID COMMA #
+decl -> idList COLON ID # 
+idList -> ID idList1 #
+idList1 -> COMMA ID idList1 #       idList1 -> # ##
