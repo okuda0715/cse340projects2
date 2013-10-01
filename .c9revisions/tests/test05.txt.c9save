@@ -1,0 +1,1 @@
+{"ts":1380609894315,"silentsave":true,"restoring":false,"patch":[[{"diffs":[[1,"expr term factor #\nPLUS MINUS MULT COMMA #\nexpr -> term PLUS expr #\nexpr -> term MINUS expr #\nexpr -> term #\nPLUS -> MINUS #\nfactor -> LPAREN expr RPAREN #\nfactor -> NUM #\nfactor -> REALNUM # \nhello -> PLUS #\n$$$\n##\n\n"]],"start1":0,"start2":0,"length1":0,"length2":217}]],"length":217}

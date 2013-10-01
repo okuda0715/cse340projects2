@@ -1,0 +1,1 @@
+{"ts":1380613764103,"silentsave":true,"restoring":false,"patch":[[{"diffs":[[1,"decl idList1 idList #\nCOLON ID COMMA #\ndecl -> idList COLON ID # \nidList -> ID idList1 #\nidList1 -> COMMA ID idList1 #       idList1 -> # ##\n\n"]],"start1":0,"start2":0,"length1":0,"length2":142}]],"length":142}
