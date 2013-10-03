@@ -70,7 +70,7 @@ void checkErrorCodeThree(string tmp) {
 
 void readNonTerminals() {
     string tmp;
-    cin >> temp;
+    cin >> tmp;
     while(tmp.compare("#") != 0) {                  //loop throught until it finds a '#'
         checkErrorCodeZero(tmp);
         nonTerminals.push_back(tmp);                //add the token to the vector non-terminal
@@ -78,9 +78,9 @@ void readNonTerminals() {
     }
 }
 
-void readTerminals(string tmp) {
+void readTerminals() {
     string tmp;
-    cin >> temp;
+    cin >> tmp;
     while(tmp.compare("#") != 0) {                  //loop throught until it finds a '#'
         checkErrorCodeZero(tmp);
         terminals.push_back(tmp);                   //add the token to the vector terminal
@@ -122,55 +122,55 @@ void readGrammar() {
     // iterator intIterator;
     // std::vector<int>::iterator intIterator;
     
-    while(tmp.compare("##") != 0) {
-        for(int i = 0; i < tmp.length(); i++) {
-            if(ispunct(tmp.data()[i])) {            //checks to make sure there are no punctuation in the token
-                throw error_code_0;
-            }
-            if(isdigit(tmp.data()[0])) {            //chekcs to make sure the first character in the token is not a digit
-                throw error_code_0;
-            }
-        }
+    // while(tmp.compare("##") != 0) {
+    //     for(int i = 0; i < tmp.length(); i++) {
+    //         if(ispunct(tmp.data()[i])) {            //checks to make sure there are no punctuation in the token
+    //             throw error_code_0;
+    //         }
+    //         if(isdigit(tmp.data()[0])) {            //chekcs to make sure the first character in the token is not a digit
+    //             throw error_code_0;
+    //         }
+    //     }
         
-        intIterator = find(rules.begin(), rules.end(), tmp);
-        rule1.LHS = intIterator;
+    //     intIterator = find(rules.begin(), rules.end(), tmp);
+    //     rule1.LHS = intIterator;
         
-        cin >> tmp;
-        if(tmp.compare("->") == 0) {
-            cin >> tmp;
+    //     cin >> tmp;
+    //     if(tmp.compare("->") == 0) {
+    //         cin >> tmp;
             
-            if(tmp.compare("#") == 0 || tmp.compare("##") == 0) {
-                intIterator = find(rules.begin(), rules.end(), tmp);
-                rule1.RHS.push_back(intIterator);
-            }
-            else {
-                while(tmp.compare("#") != 0 && tmp.compare("##") != 0) {
-                    for(int i = 0; i < tmp.length(); i++) {
-                        if(ispunct(tmp.data()[i])) {            //checks to make sure there are no punctuation in the token
-                            throw error_code_0;
-                        }
-                        if(isdigit(tmp.data()[0])) {            //chekcs to make sure the first character in the token is not a digit
-                            throw error_code_0;
-                         }
-                    }
+    //         if(tmp.compare("#") == 0 || tmp.compare("##") == 0) {
+    //             intIterator = find(rules.begin(), rules.end(), tmp);
+    //             rule1.RHS.push_back(intIterator);
+    //         }
+    //         else {
+    //             while(tmp.compare("#") != 0 && tmp.compare("##") != 0) {
+    //                 for(int i = 0; i < tmp.length(); i++) {
+    //                     if(ispunct(tmp.data()[i])) {            //checks to make sure there are no punctuation in the token
+    //                         throw error_code_0;
+    //                     }
+    //                     if(isdigit(tmp.data()[0])) {            //chekcs to make sure the first character in the token is not a digit
+    //                         throw error_code_0;
+    //                      }
+    //                 }
                     
-                    intIterator = find(rules.begin(), rules.end(), tmp);
-                    rule1.RHS.push_back(intIterator);
-                    cin >> tmp;
-                }
-            }
-        }
-        else {
-            for(int i = 0; i < tmp.length(); i++) {
-                if(ispunct(tmp.data()[i])) {            //checks to make sure there are no punctuation in the token
-                    throw error_code_0;
-                }
-                if(isdigit(tmp.data()[0])) {            //chekcs to make sure the first character in the token is not a digit
-                    throw error_code_0;
-                }
-            }
-        }
-    }
+    //                 intIterator = find(rules.begin(), rules.end(), tmp);
+    //                 rule1.RHS.push_back(intIterator);
+    //                 cin >> tmp;
+    //             }
+    //         }
+    //     }
+    //     else {
+    //         for(int i = 0; i < tmp.length(); i++) {
+    //             if(ispunct(tmp.data()[i])) {            //checks to make sure there are no punctuation in the token
+    //                 throw error_code_0;
+    //             }
+    //             if(isdigit(tmp.data()[0])) {            //chekcs to make sure the first character in the token is not a digit
+    //                 throw error_code_0;
+    //             }
+    //         }
+    //     }
+    // }
 }
     
 
@@ -187,7 +187,7 @@ int main() {
             nT.push_back(false);    
         }
         for(int i=0; i < terminals.size(); i++) {
-            n.push_back(false);
+            t.push_back(false);
         }
         
         readGrammar();
@@ -212,14 +212,14 @@ int main() {
         }
     }
     
-    for (unsigned n=0; n<rules.size(); ++n) {
-        cout << rules.at(n) << " ";
-    }
+    // for (unsigned n=0; n<rules.size(); ++n) {
+    //     cout << rules.at(n) << " ";
+    // }
     
-    cout << rule1.LHS << endl;
-    for(unsigned n=0; n<rule1.RHS.size(); ++n) {
-        cout << rule1.RHS.at(n) << " ";
-    }
+    // cout << rule1.LHS << endl;
+    // for(unsigned n=0; n<rule1.RHS.size(); ++n) {
+    //     cout << rule1.RHS.at(n) << " ";
+    // }
     // for (unsigned n=0; n<terminals.size(); ++n) {
     //     cout << terminals.at(n) << " ";
     // }
