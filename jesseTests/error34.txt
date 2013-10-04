@@ -1,0 +1,9 @@
+expr term factor #
+PLUS MINUS MULT COMMA #
+expr -> term PLUS expr #
+term -> term MINUS expr #
+factor -> term #
+PLUS -> MINUS #
+factor -> expr #
+##
+

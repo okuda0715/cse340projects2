@@ -1,0 +1,8 @@
+expr term factor #
+PLUS MINUS MULT COMMA SPACE #
+expr -> term PLUS expr #
+expr -> term MINUS expr #
+term -> term SPECIAL #
+term -> MINUS COMMA MULT #
+##
+

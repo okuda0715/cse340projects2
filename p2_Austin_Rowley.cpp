@@ -12,7 +12,8 @@ enum errorCodes {
     error_code_0 = 0,
     error_code_1,
     error_code_2,
-    error_code_3
+    error_code_3,
+    error_code_4
 };
 
 struct Rules {
@@ -25,6 +26,7 @@ vector<string> terminals;                           //vector to hold a list of t
 vector<string> reference;                           //vector to hold a list of rules
 vector<bool> nT;
 vector<bool> t;
+vector<string> errorCodeVector;
 //vector< vector<int> > reference;
 
 //Rules rule1;
@@ -44,7 +46,7 @@ void checkErrorCodeZero(string tmp) {
         if(ispunct(tmp.data()[i])) {            //checks to make sure there are no punctuation in the token
             throw error_code_0;
         }
-        if(isdigit(tmp.data()[0])) {            //chekcs to make sure the first character in the token is not a digit
+        if(isdigit(tmp.data()[0])) {            //checks to make sure the first character in the token is not a digit
             throw error_code_0;
         }
     }
@@ -55,9 +57,6 @@ void checkErrorCodeTwo(string tmp) {
     int index2 = findTokenInVector(terminals, tmp);
     if(index == -1 && index2 == -1) {
         throw error_code_2;
-    }
-    else {
-        
     }
 }
 
@@ -111,66 +110,42 @@ void readGrammar() {
     string tmp;
     cin >> tmp;
     
-    checkErrorCodeZero(tmp);            //checking syntax
-    checkErrorCodeTwo(tmp);             //checking to make sure the token is listed in section 1 or 2, if no error then we assume that the token is either in section 1 or 2 or both as a T or NT
-    checkErrorCodeThree(tmp);           //checking to make sure its a NT on the LHS
-    
-    
-    
-    
-    
-    // iterator intIterator;
-    // std::vector<int>::iterator intIterator;
-    
-    // while(tmp.compare("##") != 0) {
-    //     for(int i = 0; i < tmp.length(); i++) {
-    //         if(ispunct(tmp.data()[i])) {            //checks to make sure there are no punctuation in the token
-    //             throw error_code_0;
-    //         }
-    //         if(isdigit(tmp.data()[0])) {            //chekcs to make sure the first character in the token is not a digit
-    //             throw error_code_0;
-    //         }
-    //     }
+    while(tmp.compare("##") != 0) {
+        //start of LHS
+        checkErrorCodeZero(tmp);            //checking syntax
+        checkErrorCodeTwo(tmp);             /*checking to make sure the token is listed in section 1 or 2,
+                                            if no error then we assume that the token is either in 
+                                            section 1 or 2 or both as a T or NT*/
+        checkErrorCodeThree(tmp);           //checking to make sure its a NT on the LHS
+        //add it to LHS rule
+        cout << tmp;
+        //end of LHS
         
-    //     intIterator = find(rules.begin(), rules.end(), tmp);
-    //     rule1.LHS = intIterator;
-        
-    //     cin >> tmp;
-    //     if(tmp.compare("->") == 0) {
-    //         cin >> tmp;
+        cin >> tmp;
+        if(tmp.compare("->") == 0) {
+            cin >> tmp;
             
-    //         if(tmp.compare("#") == 0 || tmp.compare("##") == 0) {
-    //             intIterator = find(rules.begin(), rules.end(), tmp);
-    //             rule1.RHS.push_back(intIterator);
-    //         }
-    //         else {
-    //             while(tmp.compare("#") != 0 && tmp.compare("##") != 0) {
-    //                 for(int i = 0; i < tmp.length(); i++) {
-    //                     if(ispunct(tmp.data()[i])) {            //checks to make sure there are no punctuation in the token
-    //                         throw error_code_0;
-    //                     }
-    //                     if(isdigit(tmp.data()[0])) {            //chekcs to make sure the first character in the token is not a digit
-    //                         throw error_code_0;
-    //                      }
-    //                 }
-                    
-    //                 intIterator = find(rules.begin(), rules.end(), tmp);
-    //                 rule1.RHS.push_back(intIterator);
-    //                 cin >> tmp;
-    //             }
-    //         }
-    //     }
-    //     else {
-    //         for(int i = 0; i < tmp.length(); i++) {
-    //             if(ispunct(tmp.data()[i])) {            //checks to make sure there are no punctuation in the token
-    //                 throw error_code_0;
-    //             }
-    //             if(isdigit(tmp.data()[0])) {            //chekcs to make sure the first character in the token is not a digit
-    //                 throw error_code_0;
-    //             }
-    //         }
-    //     }
-    // }
+            //start of RHS
+            if(tmp.compare("#") == 0 || tmp.compare("##") == 0) {
+                cout << "epsilon";                                  //FIXME
+            }
+            else {
+                while(tmp.compare("#") != 0 || tmp.compare("##") != 0) {
+                    checkErrorCodeZero(tmp);
+                    checkErrorCodeTwo(tmp); 
+                    cout << tmp;
+                    //add to RHS rule
+                    cin >> tmp;
+                }
+            }
+        }
+        else {
+            throw error_code_0;
+        }
+        
+        
+        cin >> tmp;
+    }
 }
     
 
@@ -194,27 +169,40 @@ int main() {
         
     } catch(errorCodes error) {
         switch (error) {
-            case error_code_0:
+            case error_code_0: {
                 cout << "ERROR CODE 0" << endl;
+                exit(0);
                 break;
-            case error_code_1:
-                cout << "ERROR CODE 1" << endl;
+            }
+            case error_code_1: {
+                string error1 = "ERROR CODE 1";
+                errorCodeVector.push_back(error1);
                 break;
-            case error_code_2:
-                cout << "ERROR CODE 2" << endl;
+            }
+            case error_code_2: {
+                string error2 = "ERROR CODE 2";
+                errorCodeVector.push_back(error2);
                 break;
-            case error_code_3:
-                cout << "ERROR CODE 3" << endl;
+            }
+            case error_code_3: {
+                string error3 = "ERROR CODE 3";
+                errorCodeVector.push_back(error3);
                 break;
+            }
+            case error_code_4: {
+                string error4 = "ERROR CODE 4";
+                errorCodeVector.push_back(error4);
+                break; 
+            }
             default:
                 cout << "It should never come to the default case" << endl;
                 break;
         }
     }
     
-    // for (unsigned n=0; n<rules.size(); ++n) {
-    //     cout << rules.at(n) << " ";
-    // }
+    for (unsigned n=0; n<errorCodeVector.size(); ++n) {
+        cout << errorCodeVector.at(n) << "\n";
+    }
     
     // cout << rule1.LHS << endl;
     // for(unsigned n=0; n<rule1.RHS.size(); ++n) {
