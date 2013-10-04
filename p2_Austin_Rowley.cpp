@@ -168,12 +168,11 @@ void readGrammar() {
                 vecOfRules.push_back(rule);
             }
             else {                                                  //this is for the case of normal tokens
-                while(tmp.compare("#") != 0) {                    //loop as long as "#" is not found, this makes it so it breaks up the rules
-                    int index = findTokenInVector(reference, tmp);  //similar with error 1 and that its checking the terminal vector
-                    int index2 = findTokenInVector(reference, tmp);    
-                    if(index == -1) {                               //if the token is found then mark the vector 1 at that index
+                while(tmp.compare("#") != 0) {                      //loop as long as "#" is not found, this makes it so it breaks up the rules
+                    int index = findTokenInVector(terminals, tmp);  //similar with error 1 and that its checking the terminal vector
+                        
+                    if(index != -1) {                               //if the token is found then mark the vector 1 at that index
                         t.at(index) = 1;
-                        nT.at(index) = 1;
                     }
                     checkErrorCodeZero(tmp);        
                     checkErrorCodeTwo(tmp); 
@@ -199,9 +198,9 @@ void readGrammar() {
             checkErrorCodeOne();
             checkErrorCodeFour();
         }
-        for(int i=0; i < rule.RHS.size(); i++) {
-            cout << "RHS: " << rule.RHS.at(i) << "\n";
-        }
+        // for(int i=0; i < rule.RHS.size(); i++) {
+        //     cout << "RHS: " << rule.RHS.at(i) << "\n";
+        // }
     }
 }
     
