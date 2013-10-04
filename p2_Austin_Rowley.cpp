@@ -24,12 +24,11 @@ struct Rules {
 vector<string> nonTerminals;                        //vector to hold a list of non-terminal tokens
 vector<string> terminals;                           //vector to hold a list of terminal tokens
 vector<string> reference;                           //vector to hold a list of rules
-vector<bool> nT;
-vector<bool> t;
+vector<int> nT;
+vector<int> t;
 vector<string> errorCodeVector;
-//vector< vector<int> > reference;
+vector<Rules> vecOfRules;
 
-//Rules rule1;
 
 int findTokenInVector(vector<string> tmpVec, string tmp) {
     int index = -1;
@@ -52,18 +51,46 @@ void checkErrorCodeZero(string tmp) {
     }
 }
 
+void checkErrorCodeOne() {
+    for(int i=0; i < nT.size(); i++) {
+        if(nT.at(i) == 0) {
+            int index = findTokenInVector(errorCodeVector, "ERROR CODE 1");
+            if(index == -1) {
+                errorCodeVector.push_back("ERROR CODE 1");
+            }
+        }
+    }
+}
+
 void checkErrorCodeTwo(string tmp) {
     int index = findTokenInVector(nonTerminals, tmp);
     int index2 = findTokenInVector(terminals, tmp);
     if(index == -1 && index2 == -1) {
-        throw error_code_2;
+        int index = findTokenInVector(errorCodeVector, "ERROR CODE 2");
+        if(index == -1) {
+            errorCodeVector.push_back("ERROR CODE 2");
+        }
     }
 }
 
 void checkErrorCodeThree(string tmp) {
     int index = findTokenInVector(terminals, tmp);
     if(index != -1) {
-        throw error_code_3;
+        int index = findTokenInVector(errorCodeVector, "ERROR CODE 3");
+        if(index == -1) {
+            errorCodeVector.push_back("ERROR CODE 3");
+        }
+    }
+}
+
+void checkErrorCodeFour() {
+    for(int i=0; i < t.size(); i++) {
+        if(t.at(i) == 0) {
+            int index = findTokenInVector(errorCodeVector, "ERROR CODE 4");
+            if(index == -1) {
+                errorCodeVector.push_back("ERROR CODE 4");
+            }
+        }
     }
 }
 
@@ -97,72 +124,99 @@ void createReferenceVector() {
     for(int i=0; i < nonTerminals.size(); i++) {
         reference.push_back(nonTerminals.at(i));
     }
-    // for (int i = 0; i < 10; i++) {
-    //     vector<string> row; // Create an empty row
-    //     for (int j = 0; j < 20; j++) {
-    //         row.push_back(i * j); // Add an element (column) to the row
-    //     }
-    //     vec.push_back(row); // Add the row to the main vector
-    // }
 }
 
 void readGrammar() {
-    string tmp;
-    cin >> tmp;
     
-    while(tmp.compare("##") != 0) {
-        //start of LHS
-        checkErrorCodeZero(tmp);            //checking syntax
+    string tmp;
+    cin >> tmp;                             //read the first token in section 3 the rules
+    
+    while(tmp.compare("##") != 0) {         //exit the loop when a "##" is found in the file
+        Rules rule;                         //create a new rule
+        
+        //****start of LHS****//
+        checkErrorCodeZero(tmp);            //checking for syntax errors
+        
+        int index = findTokenInVector(nonTerminals, tmp);       /*because this token is on the LHS, check to make sure its
+                                                                  a non-terminal. It will find the token in the non-terminal
+                                                                  vector and return the index*/
+        if(index != -1) {                   //if the token is found then the value is changed to 1 signifying that its been found
+            nT.at(index) = 1;
+        }
+        
         checkErrorCodeTwo(tmp);             /*checking to make sure the token is listed in section 1 or 2,
                                             if no error then we assume that the token is either in 
                                             section 1 or 2 or both as a T or NT*/
         checkErrorCodeThree(tmp);           //checking to make sure its a NT on the LHS
-        //add it to LHS rule
-        cout << tmp;
-        //end of LHS
         
-        cin >> tmp;
-        if(tmp.compare("->") == 0) {
-            cin >> tmp;
+        index = findTokenInVector(reference, tmp);              //once it passes error 0, 2, 3 then add it to the rule
+        rule.LHS = index;
+        //****end of LHS****//
+        
+        cin >> tmp;                         //read the next token
+        
+        if(tmp.compare("->") == 0) {        //the next token needs to be an "->" to be a valid file
+            cin >> tmp;                     //read the next token
             
-            //start of RHS
-            if(tmp.compare("#") == 0 || tmp.compare("##") == 0) {
-                cout << "epsilon";                                  //FIXME
+            //****start of RHS****//
+            if(tmp.compare("##") == 0) {    //if the next token after "->" is "##" then error code 0
+                throw error_code_0;
             }
-            else {
-                while(tmp.compare("#") != 0 || tmp.compare("##") != 0) {
-                    checkErrorCodeZero(tmp);
+            else if(tmp.compare("#") == 0) {                        //if the next token after "->" is "#" then its epsilon
+                int index = findTokenInVector(reference, tmp);
+                rule.RHS.push_back(index);                          //find the index, add it to the rule, then add the rule to a vector of rules
+                vecOfRules.push_back(rule);
+            }
+            else {                                                  //this is for the case of normal tokens
+                while(tmp.compare("#") != 0) {                    //loop as long as "#" is not found, this makes it so it breaks up the rules
+                    int index = findTokenInVector(reference, tmp);  //similar with error 1 and that its checking the terminal vector
+                    int index2 = findTokenInVector(reference, tmp);    
+                    if(index == -1) {                               //if the token is found then mark the vector 1 at that index
+                        t.at(index) = 1;
+                        nT.at(index) = 1;
+                    }
+                    checkErrorCodeZero(tmp);        
                     checkErrorCodeTwo(tmp); 
-                    cout << tmp;
-                    //add to RHS rule
-                    cin >> tmp;
+                    index = findTokenInVector(reference, tmp);      //if error check passes then add the index to the rule
+                    rule.RHS.push_back(index);
+                    cin >> tmp;                                     //read the next token
                 }
+                vecOfRules.push_back(rule);                         //add the rule to the vector of rules
             }
         }
         else {
-            throw error_code_0;
+            throw error_code_0;                                     //error code 0 if the second token is not a "->"
         }
-        
-        
-        cin >> tmp;
+        cin >> tmp;                                                 //read the next token
+        if(tmp.compare("##") == 0) {                                /*if the token is "##" then check for error code 1 and 4,
+                                                                      because at this point its at the end of the file and you
+                                                                      know you've read in all the inputs. Since the t and nT 
+                                                                      vectors were being marked as tokens were being read in,
+                                                                      these vectors will all have a true value in them (meaning
+                                                                      all the terminals and non-terminals were accounted for) or
+                                                                      if it has at least one false value then error codes will be 
+                                                                      thrown in their respective functions*/
+            checkErrorCodeOne();
+            checkErrorCodeFour();
+        }
+        for(int i=0; i < rule.RHS.size(); i++) {
+            cout << "RHS: " << rule.RHS.at(i) << "\n";
+        }
     }
 }
     
 
 int main() {
-    // string tmp;     //hold the temporary token from file
-    // cin >> tmp;     //read in the first token
-    
     try {
         readNonTerminals();             //read the first line in the file
         readTerminals();                //read the second line in the file
         createReferenceVector();        //reference vector used to reference tokens to see if they exits within section 1 and section 2
         
         for(int i=0; i < nonTerminals.size(); i++) {
-            nT.push_back(false);    
+            nT.push_back(0);    
         }
         for(int i=0; i < terminals.size(); i++) {
-            t.push_back(false);
+            t.push_back(0);
         }
         
         readGrammar();
@@ -179,16 +233,6 @@ int main() {
                 errorCodeVector.push_back(error1);
                 break;
             }
-            case error_code_2: {
-                string error2 = "ERROR CODE 2";
-                errorCodeVector.push_back(error2);
-                break;
-            }
-            case error_code_3: {
-                string error3 = "ERROR CODE 3";
-                errorCodeVector.push_back(error3);
-                break;
-            }
             case error_code_4: {
                 string error4 = "ERROR CODE 4";
                 errorCodeVector.push_back(error4);
@@ -199,10 +243,15 @@ int main() {
                 break;
         }
     }
+    std::sort(errorCodeVector.begin(), errorCodeVector.end());
     
     for (unsigned n=0; n<errorCodeVector.size(); ++n) {
         cout << errorCodeVector.at(n) << "\n";
     }
+    
+    
+    
+    
     
     // cout << rule1.LHS << endl;
     // for(unsigned n=0; n<rule1.RHS.size(); ++n) {
