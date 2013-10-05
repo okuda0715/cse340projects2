@@ -237,7 +237,7 @@ void calculateFirstSet() {
             //loop through the RHS, add FIRST(A1) - e to FIRST(A)
             
             int j = 0;
-            for(j; j < vecOfRules.at(i).RHS.size() - 1; j++) {
+            for(j; j < vecOfRules.at(i).RHS.size(); j++) {
                 vector<int> v1 = ultimateFirstSet.at(vecOfRules.at(i).LHS);
                 vector<int> v2 = ultimateFirstSet.at(vecOfRules.at(i).RHS.at(j));
                 
@@ -292,14 +292,6 @@ void calculateFirstSet() {
 }
 
 void printFirstSet() {
-    // for(int i=terminals.size() + 2; i < reference.size(); i++) {
-    //     for(int j=0; j < ultimateFirstSet.size(); j++) {
-    //         if(ultimateFirstSet.at(terminals.size() + 2).at(j) == 1) {
-    //             cout << "FIRST(" << reference.at(terminals.size() + 2) << ") = { " << reference.at(j) << " }" << "\n";
-    //         }
-    //     }
-        
-    // }
     for(int i=terminals.size() +2; i < reference.size(); i++) {
         bool flag = false;
         
@@ -319,8 +311,6 @@ void printFirstSet() {
         }
         cout << " }" << "\n";
     }
-    
-        
 }
 
 int main() {
@@ -338,11 +328,12 @@ int main() {
         
         readGrammar();                  //read in the grammar and perform all error checking
         
-        calculateFirstSet();
+        if(errorCodeVector.empty()) {
+            calculateFirstSet();
         printFirstSet();
         // calculateFollowSet();
         // printFollowSet();
-        
+        }
     } catch(errorCodes error) {
         switch (error) {
             case error_code_0: {
