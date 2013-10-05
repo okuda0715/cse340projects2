@@ -24,11 +24,12 @@ struct Rules {
 vector<string> nonTerminals;                        //vector to hold a list of non-terminal tokens
 vector<string> terminals;                           //vector to hold a list of terminal tokens
 vector<string> reference;                           //vector to hold a list of rules
-vector<int> nT;
-vector<int> t;
-vector<string> errorCodeVector;
-vector<Rules> vecOfRules;
+vector<int> nT;                                     //vector for error check 1
+vector<int> t;                                      //vector for error check 4
+vector<string> errorCodeVector;                     //vector to hold the error codes
+vector<Rules> vecOfRules;                           //vector of rules
 
+vector< vector<int> > ultimateFirstSet;
 
 int findTokenInVector(vector<string> tmpVec, string tmp) {
     int index = -1;
@@ -204,6 +205,123 @@ void readGrammar() {
     }
 }
     
+vector<int> unionSet(vector<int> v1, vector<int> v2) { 
+    vector<int> v3(v1.size(), 0);
+    for(int i=0; i < v1.size(); i++) {
+        if(v1.at(i) == 1 || v2.at(i) == 1) {
+            v3.at(i) = 1;
+        }
+    }
+    return v3;
+}    
+    
+void calculateFirstSet() {
+    vector<int> firstSet(reference.size(), 0);          //the default vector that has the same size as the reference vector with 
+                                                        //initial values of 0, meaning they are all false
+    
+    for(int i=0; i < reference.size(); i++) {           //loop to add the default vector to the big vector essentially making it a 2d vector
+        vector<int> defaultFirst(firstSet);
+        ultimateFirstSet.push_back(defaultFirst);
+        
+        if(i == 0 || (i > 1 && i < terminals.size() + 2)) {         //add 1(true) to all the terminals because FIRST(terminal) = {terminal}
+            ultimateFirstSet.at(i).at(i) = 1;
+        }
+    }
+   
+    bool change = true;                                 //a flag to keep track of whether or not the vectors are changing
+    while(change) {
+        change = false;
+        
+        //for all rules
+        for(int i=0; i < vecOfRules.size(); i++) {                                      //loop through all of the rules
+            //loop through the RHS, add FIRST(A1) - e to FIRST(A)
+            
+            int j = 0;
+            for(j; j < vecOfRules.at(i).RHS.size() - 1; j++) {
+                vector<int> v1 = ultimateFirstSet.at(vecOfRules.at(i).LHS);
+                vector<int> v2 = ultimateFirstSet.at(vecOfRules.at(i).RHS.at(j));
+                
+                vector<int> copyVec(v1);                                                //copy of the FIRST(LHS) so I can compare later for change
+                
+                ultimateFirstSet.at(vecOfRules.at(i).LHS) = unionSet(v1, v2);
+                
+                // for(int n=0; n < copyVec.size(); n++) {
+                //     cout << copyVec.at(n) << " ";
+                // }
+                // for(int m=0; m < ultimateFirstSet.size(); m++) {
+                //     cout << ultimateFirstSet.at(vecOfRules.at(i).LHS).at(m);
+                // }
+                
+                if(copyVec != ultimateFirstSet.at(vecOfRules.at(i).LHS)) {
+                    change = true;
+                } 
+                
+                if(ultimateFirstSet.at(vecOfRules.at(i).RHS.at(j)).at(0) != 1) {        //if = 1 then there is epsilon, therefore continue
+                                                                                        //add FIRST(An) - e to FIRST(A) 
+                    break;
+                }
+                
+                // for(int i=0; i < v1.size(); i++) {
+                //     cout << v1.at(i) << " ";
+                // }
+                // cout << "\n";
+                // for(int i=0; i < v2.size(); i++) {
+                //     cout << v2.at(i) << " ";
+                // }
+                // break;
+            }//end of inner for loop
+            
+            if(j == vecOfRules.at(i).RHS.size() - 1) {                              //if j is the last index on RHS then that means its done 
+                                                                                    //the unionSets for each token on the RHS
+                if(ultimateFirstSet.at(vecOfRules.at(i).RHS.at(j)).at(0) == 1) {    //if epsilon exits in the last FIRST(RHS) then its assumed
+                                                                                    //that epsilon belonged in all FIRST(RHS) therefore add 
+                                                                                    //epsilon to FIRST(LHS)
+                    ultimateFirstSet.at(vecOfRules.at(i).LHS).at(0) = 1;
+                }
+            }
+        }//end of outer for loop
+    }
+    
+    //print matrix
+    for(int i = 0; i < reference.size(); i++ ) {
+        for(int j = 0; j < reference.size(); j++ ) {
+            cout << ultimateFirstSet.at(i).at(j) << " ";
+        }
+        cout << endl;
+    }
+}
+
+void printFirstSet() {
+    // for(int i=terminals.size() + 2; i < reference.size(); i++) {
+    //     for(int j=0; j < ultimateFirstSet.size(); j++) {
+    //         if(ultimateFirstSet.at(terminals.size() + 2).at(j) == 1) {
+    //             cout << "FIRST(" << reference.at(terminals.size() + 2) << ") = { " << reference.at(j) << " }" << "\n";
+    //         }
+    //     }
+        
+    // }
+    for(int i=terminals.size() +2; i < reference.size(); i++) {
+        bool flag = false;
+        
+        cout << "FIRST(" << reference.at(i) << ") = {";
+        for(int j=0; j < ultimateFirstSet.size(); j++) {
+            
+            if(ultimateFirstSet.at(i).at(j) == 1) {
+                if(!flag) {
+                    flag = true;
+                     
+                }
+                else {
+                    cout << ",";
+                }
+                cout << " " << reference.at(j);
+            }
+        }
+        cout << " }" << "\n";
+    }
+    
+        
+}
 
 int main() {
     try {
@@ -218,7 +336,12 @@ int main() {
             t.push_back(0);
         }
         
-        readGrammar();
+        readGrammar();                  //read in the grammar and perform all error checking
+        
+        calculateFirstSet();
+        printFirstSet();
+        // calculateFollowSet();
+        // printFollowSet();
         
     } catch(errorCodes error) {
         switch (error) {
@@ -227,24 +350,14 @@ int main() {
                 exit(0);
                 break;
             }
-            case error_code_1: {
-                string error1 = "ERROR CODE 1";
-                errorCodeVector.push_back(error1);
-                break;
-            }
-            case error_code_4: {
-                string error4 = "ERROR CODE 4";
-                errorCodeVector.push_back(error4);
-                break; 
-            }
             default:
-                cout << "It should never come to the default case" << endl;
+                cout << "It should never get to the default case" << endl;
                 break;
         }
     }
     std::sort(errorCodeVector.begin(), errorCodeVector.end());
     
-    for (unsigned n=0; n<errorCodeVector.size(); ++n) {
+    for (int n=0; n<errorCodeVector.size(); ++n) {
         cout << errorCodeVector.at(n) << "\n";
     }
     
