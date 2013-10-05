@@ -1,5 +1,0 @@
-decl idList1 idList #
-COLON 9 ID ,COMMA #
-decl -> idList COLON ID # 
-idList -> ID idList1 #
-idList1 -> COMMA ID idList1 #       idList1 -> # ##
