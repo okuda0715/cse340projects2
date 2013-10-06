@@ -1,3 +1,7 @@
+/*Austin Rowley
+  Project 2
+  cse340        */
+
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -63,9 +67,9 @@ void checkErrorCodeOne() {
     }
 }
 
-/************function for finding a token within a specific vector************/
+/************function for checking error code 2************/
 void checkErrorCodeTwo(string tmp) {
-    int index = findTokenInVector(nonTerminals, tmp);
+    int index = findTokenInVector(nonTerminals, tmp);                           //search through terminals and non-terminals, if not found then its error code 2
     int index2 = findTokenInVector(terminals, tmp);
     if(index == -1 && index2 == -1) {
         int index = findTokenInVector(errorCodeVector, "ERROR CODE 2");         //checking for duplicate error code 2 message
@@ -75,62 +79,68 @@ void checkErrorCodeTwo(string tmp) {
     }
 }
 
+/************function for checking error code 3************/
 void checkErrorCodeThree(string tmp) {
     int index = findTokenInVector(terminals, tmp);
-    if(index != -1) {
-        int index = findTokenInVector(errorCodeVector, "ERROR CODE 3");
+    if(index != -1) {                                                           
+        int index = findTokenInVector(errorCodeVector, "ERROR CODE 3");         //checking for duplicate error code 2 message
         if(index == -1) {
-            errorCodeVector.push_back("ERROR CODE 3");
+            errorCodeVector.push_back("ERROR CODE 3");                          //if not found then add it to the vector of errors
         }
     }
 }
 
+/************function for checking error code 4************/
 void checkErrorCodeFour() {
     for(int i=0; i < t.size(); i++) {
         if(t.at(i) == 0) {
-            int index = findTokenInVector(errorCodeVector, "ERROR CODE 4");
+            int index = findTokenInVector(errorCodeVector, "ERROR CODE 4");     //checking for duplicate error code 2 message
             if(index == -1) {
-                errorCodeVector.push_back("ERROR CODE 4");
+                errorCodeVector.push_back("ERROR CODE 4");                      //if not found then add it to the vector of errors
             }
         }
     }
 }
 
+/************function reading in non-terminals************/
 void readNonTerminals() {
     string tmp;
     cin >> tmp;
     while(tmp.compare("#") != 0) {                  //loop throught until it finds a '#'
-        checkErrorCodeZero(tmp);
+        checkErrorCodeZero(tmp);                    //check for syntax errors
         nonTerminals.push_back(tmp);                //add the token to the vector non-terminal
         cin >> tmp;                                 //read in the next token
     }
 }
 
+/************function reading in terminals************/
 void readTerminals() {
     string tmp;
     cin >> tmp;
     while(tmp.compare("#") != 0) {                  //loop throught until it finds a '#'
-        checkErrorCodeZero(tmp);
+        checkErrorCodeZero(tmp);                    //check for syntax errors
         terminals.push_back(tmp);                   //add the token to the vector terminal
         cin >> tmp;                                 //read in the next token
     }
 }
 
+/************function for creating a reference vector************/
 void createReferenceVector() {
-    reference.push_back("#");
+    reference.push_back("#");                       //my reference is set up such that epsilon is first followed by an eof
     reference.push_back("$");
     
-    for(int i=0; i < terminals.size(); i++) {
+    for(int i=0; i < terminals.size(); i++) {       //add terminals to reference vector
         reference.push_back(terminals.at(i));
     }
-    for(int i=0; i < nonTerminals.size(); i++) {
+    for(int i=0; i < nonTerminals.size(); i++) {    //add non-terminals to reference vector
         reference.push_back(nonTerminals.at(i));
     }
 }
 
+/************function for reading in section 3************/
 void readGrammar() {
     string tmp;
-    cin >> tmp;                             //read the first token in section 3 the rules
+    cin >> tmp;                             //read the first token in section 3 
     
     while(tmp.compare("##") != 0) {         //exit the loop when a "##" is found in the file
         Rules rule;                         //create a new rule
@@ -141,7 +151,7 @@ void readGrammar() {
         int index = findTokenInVector(nonTerminals, tmp);       /*because this token is on the LHS, check to make sure its
                                                                   a non-terminal. It will find the token in the non-terminal
                                                                   vector and return the index*/
-        if(index != -1) {                   //if the token is found then the value is changed to 1 signifying that its been found
+        if(index != -1) {                   //if the token is found then the value at that index is changed to 1 signifying that its been found
             nT.at(index) = 1;
         }
         
@@ -202,9 +212,26 @@ void readGrammar() {
     }
 }
     
+/************function for doing a union on two vectors************/
 vector<int> unionSet(vector<int> v1, vector<int> v2) { 
     vector<int> v3(v1.size(), 0);
     for(int i=0; i < v1.size(); i++) {
+        if(v1.at(i) == 1 || v2.at(i) == 1) {                //1: exist and 0: not exist, so here I'm checking each element in both vectors
+                                                            //and if it has a 1 then add that to the new vector
+            v3.at(i) = 1;
+        }
+    }
+    return v3;
+}   
+
+/************function for doing a union on two vectors but taking account for epsilon************/
+vector<int> unionSetMinusEpsilon(vector<int> v1, vector<int> v2) { 
+    vector<int> v3(v1.size(), 0);
+    for(int i=0; i < v1.size(); i++) {
+        if(v1.at(0) == 1) {                                 //same as the above function but checking to see if epsilon exists if so remove it from that vector
+            v1.at(0) = 0;
+        }
+        
         if(v1.at(i) == 1 || v2.at(i) == 1) {
             v3.at(i) = 1;
         }
@@ -212,6 +239,7 @@ vector<int> unionSet(vector<int> v1, vector<int> v2) {
     return v3;
 }    
     
+/************function for calculating the first sets************/
 void calculateFirstSet() {
     vector<int> firstSet(reference.size(), 0);          //the default vector that has the same size as the reference vector with 
                                                         //initial values of 0, meaning they are all false
@@ -240,9 +268,9 @@ void calculateFirstSet() {
                 
                 vector<int> copyVec(v1);                                                //copy of the FIRST(LHS) so I can compare later for change
                 
-                ultimateFirstSet.at(vecOfRules.at(i).LHS) = unionSet(v1, v2);
+                ultimateFirstSet.at(vecOfRules.at(i).LHS) = unionSet(v1, v2);           //add FIRST(A1) to FIRST(A)
                 
-                if(copyVec != ultimateFirstSet.at(vecOfRules.at(i).LHS)) {
+                if(copyVec != ultimateFirstSet.at(vecOfRules.at(i).LHS)) {              //checking for changes within the vector
                     change = true;
                 } 
                 
@@ -264,28 +292,29 @@ void calculateFirstSet() {
     }
 }
 
+/************function for printing out the first set************/
 void printFirstSet() {
-    for(int i=terminals.size()+2; i<ultimateFirstSet.size(); i++) {
+    for(int i=terminals.size()+2; i<ultimateFirstSet.size(); i++) {         //looping through the non-terminals
         bool isEpsilon = false;
         vector<string> sortedList;
         
-        if(ultimateFirstSet.at(i).at(0) == 1) {
+        if(ultimateFirstSet.at(i).at(0) == 1) {                             //checking for epsilon
             isEpsilon = true;
         }
-        for(int j=0; j<ultimateFirstSet.size(); j++) {
+        for(int j=0; j<ultimateFirstSet.size(); j++) {                      //add all the values to the new vector
             if(ultimateFirstSet.at(i).at(j) == 1) {
                 sortedList.push_back(reference.at(j));
             }
         }
         
         if(isEpsilon) {
-            std::sort(sortedList.begin() + 1, sortedList.end());
+            std::sort(sortedList.begin() + 1, sortedList.end());            //if epsilon exists then sort everything but the epsilon
         }
         else {
             std::sort(sortedList.begin(), sortedList.end());
         }
         
-        cout << "FIRST(" << reference.at(i) << ") = {";
+        cout << "FIRST(" << reference.at(i) << ") = {";                     //print out in the correct format
         for(int n = 0; n < sortedList.size(); n++) {
             cout << " " << sortedList.at(n);
             if(n < sortedList.size() - 1) {
@@ -296,8 +325,9 @@ void printFirstSet() {
     }
 }
 
+/************function for calculating the follow sets************/
 void calculateFollowSet() {
-    vector<int> followSet(reference.size(), 0);          //the default vector that has the same size as the reference vector with 
+    vector<int> followSet(reference.size(), 0);         //the default vector that has the same size as the reference vector with 
                                                         //initial values of 0, meaning they are all false
     
     for(int i=0; i < reference.size(); i++) {           //loop to add the default vector to the big vector essentially making it a 2d vector
@@ -311,19 +341,22 @@ void calculateFollowSet() {
     bool change = true;                                 //a flag to keep track of whether or not the vectors are changing
     while(change) {
         change = false;
-        for(int i=0; i < vecOfRules.size(); i++) {              //loop thru all the rules
+        for(int i=0; i < vecOfRules.size(); i++) {          //loop thru all the rules
         int h = vecOfRules.at(i).RHS.size() - 1;            //j starts at the righ most RHS element
+            
+            //rule 3
             for(h=h-1; h >= 0; h--) {
                 int a = vecOfRules.at(i).RHS.at(h);             //actual value of the RHS[j]
                 vector<int> v1 = ultimateFirstSet.at(vecOfRules.at(i).RHS.at(h + 1));       //vector of i at RHS + 1
                 vector<int> v2 = ultimateFollowSet.at(vecOfRules.at(i).RHS.at(h));          //vector of i at RHS[j],
             
                 if(a >= terminals.size() + 2) {
-                    ultimateFollowSet.at(vecOfRules.at(i).RHS.at(h)) = unionSet(v1, v2);        //add FOLLOW(A) to FOLLOW(Ak)
+                    ultimateFollowSet.at(vecOfRules.at(i).RHS.at(h)) = unionSetMinusEpsilon(v1, v2);        //add FOLLOW(A) to FOLLOW(Ak)
                 }
             
             }
             
+            //rule 2
             int j = vecOfRules.at(i).RHS.size() - 1;            //j starts at the righ most RHS element
             for(j; j >= 0; j--) {                               //loop from RHS[j] to RHS[0]
                 
@@ -348,33 +381,34 @@ void calculateFollowSet() {
                         } 
                     }
                 }
-            }
+            }//end of rule 2 for loop
         }    
     }
 }
 
+/************function for printing out the follow sets************/
 void printFollowSet() {
-    for(int i=terminals.size()+2; i<ultimateFollowSet.size(); i++) {
+    for(int i=terminals.size()+2; i<ultimateFollowSet.size(); i++) {        //looping through the non-terminals
         bool isDollar = false;
         vector<string> sortedList;
         
-        if(ultimateFollowSet.at(i).at(1) == 1) {
+        if(ultimateFollowSet.at(i).at(1) == 1) {                            //checking for eof
             isDollar = true;
         }
         for(int j=0; j<ultimateFollowSet.size(); j++) {
-            if(ultimateFollowSet.at(i).at(j) == 1) {
+            if(ultimateFollowSet.at(i).at(j) == 1) {                        //add all the values to the new vector
                 sortedList.push_back(reference.at(j));
             }
         }
         
         if(isDollar) {
-            std::sort(sortedList.begin() + 1, sortedList.end());
+            std::sort(sortedList.begin() + 1, sortedList.end());            //if eof exists then sort everything but the eof
         }
         else {
             std::sort(sortedList.begin(), sortedList.end());
         }
         
-        cout << "FOLLOW(" << reference.at(i) << ") = {";
+        cout << "FOLLOW(" << reference.at(i) << ") = {";                    //print out in the correct format
         for(int n = 0; n < sortedList.size(); n++) {
             cout << " " << sortedList.at(n);
             if(n < sortedList.size() - 1) {
@@ -385,13 +419,14 @@ void printFollowSet() {
     }
 }
 
+/****everthing starts here!****/
 int main() {
     try {
-        readNonTerminals();             //read the first line in the file
-        readTerminals();                //read the second line in the file
+        readNonTerminals();             //read section 1 in the file
+        readTerminals();                //read section 2 in the file
         createReferenceVector();        //reference vector used to reference tokens to see if they exits within section 1 and section 2
         
-        for(int i=0; i < nonTerminals.size(); i++) {
+        for(int i=0; i < nonTerminals.size(); i++) {        //by default the terminals and non-terminals are not found therefore add 0's
             nT.push_back(0);    
         }
         for(int i=0; i < terminals.size(); i++) {
@@ -400,13 +435,13 @@ int main() {
         
         readGrammar();                  //read in the grammar and perform all error checking
         
-        if(errorCodeVector.empty()) {
+        if(errorCodeVector.empty()) {   //if there are no erros then we can proceed to calculate the first and follow sets
             calculateFirstSet();
             printFirstSet();
             calculateFollowSet();
             printFollowSet();
         }
-    } catch(errorCodes error) {
+    } catch(errorCodes error) {         //catching error code 0 exception because it needs to terminate once this is caught
         switch (error) {
             case error_code_0: {
                 cout << "ERROR CODE 0" << endl;
@@ -418,9 +453,9 @@ int main() {
                 break;
         }
     }
-    std::sort(errorCodeVector.begin(), errorCodeVector.end());
+    std::sort(errorCodeVector.begin(), errorCodeVector.end());          //sort the error vector so they print in alphnumerical
     
-    for (int n=0; n<errorCodeVector.size(); ++n) {
+    for (int n=0; n<errorCodeVector.size(); ++n) {                      //print out error 1 through 4
         cout << errorCodeVector.at(n) << "\n";
     }
     return 0;

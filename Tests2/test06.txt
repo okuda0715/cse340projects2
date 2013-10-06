@@ -1,0 +1,7 @@
+decl idList1 idList #
+COLON ID VAR COMMA #
+decl -> idList COLON ID # 
+idList -> ID idList1 #
+test -> ID VAR #
+idList1 -> COMMA ID idList1 #       idList1 -> # ##
+
