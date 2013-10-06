@@ -1,20 +1,20 @@
 #!/bin/bash
 
 let count=0;
-for f in $(ls ./tests/*.txt); do 
-	./a.out <$f > ./tests/`basename $f .txt`.output; 
+for f in $(ls ./testsGrading/*.txt); do 
+	./a.out <$f > ./testsGrading/`basename $f .txt`.output; 
 done;
 
-for f in $(ls ./tests/*.output); do
-	diff -Bw $f  ./tests/`basename $f .output`.txt.expected > ./tests/`basename $f .output`.diff;
+for f in $(ls ./testsGrading/*.output); do
+	diff -Bw $f  ./testsGrading/`basename $f .output`.txt.expected > ./testsGrading/`basename $f .output`.diff;
 done
 
-for f in $(ls tests/*.diff); do
+for f in $(ls testsGrading/*.diff); do
 	echo "========================================================";
 	echo "FILE:" `basename $f .output`;
 	echo "========================================================";
 	if [ -s $f ]; then
-		cat ./tests/`basename $f .diff`.txt;
+		cat ./testsGrading/`basename $f .diff`.txt;
 		echo "--------------------------------------------------------";
 		cat $f
 	else
@@ -25,6 +25,6 @@ done
 
 echo $count;
 
-rm tests/*.output
-rm tests/*.diff
+rm testsGrading/*.output
+rm testsGrading/*.diff
 
